@@ -16,7 +16,8 @@ const G = {
   
   CUBE_X: 46,
   CUBE_SIZE: 8,
-  CUBE_ACCEL: 10,
+  CUBE_JUMP_SPD: 3,
+  CUBE_ACCEL: 0.75,
 
   SCREEN: vec(100, 100),
 }
@@ -93,18 +94,19 @@ const Song = [
 /**
  * @typedef {{
  * pos: Vector
+ * initY: number
  * speed: number
  * grounded: boolean
- * }} cube
+ * }} Cube
  */
 
 /**
- * @type { cube }
+ * @type { Cube }
  */
 let player;
 
 /**
- * @type { cube }
+ * @type { Cube }
  */
 let example;
 
@@ -113,12 +115,14 @@ function update() {
   if (!ticks) {
     example = {
       pos: vec(G.CUBE_X, G.EXAMPLE_Y),
+      initY: G.EXAMPLE_Y,
       speed: 0,
       grounded: true,
     }
 
     player = {
       pos: vec(G.CUBE_X, G.PLAYER_Y),
+      initY: G.PLAYER_Y,
       speed: 0,
       grounded: true,
     }
@@ -132,12 +136,17 @@ function update() {
   line(0, G.EXAMPLE_Y + G.CUBE_SIZE, G.SCREEN.x, G.EXAMPLE_Y + G.CUBE_SIZE);
   line(0, G.PLAYER_Y + G.CUBE_SIZE, G.SCREEN.x, G.PLAYER_Y + G.CUBE_SIZE);
 
-  // Draw the players
-  color("cyan")
-  rect(example.pos, G.CUBE_SIZE);
+  // Take in player input
+  if(input.isJustPressed) {
+    jump(player);
+  }
 
-  color("red")
-  rect(player.pos, G.CUBE_SIZE);
+  // Draw the players
+  color("cyan");
+  moveCube(example);
+
+  color("red");
+  moveCube(player);
 }
 
 // Plays the background song
@@ -153,4 +162,35 @@ function playSong () {
       }
     }
   }
+}
+
+/**
+ * Causes a cube to jump
+ * @param {Cube} c The cube that will jump
+ */
+function jump(c) {
+  if(c.grounded) {
+    c.speed = G.CUBE_JUMP_SPD;
+    c.grounded = false;
+    c.pos.y -= c.speed;
+  }
+}
+
+/**
+ * Handles the tick-by-tick movement of the given cube. Also draws the cube
+ * @param {Cube} c 
+ */
+function moveCube(c) {
+  if(!c.grounded) {
+    if(c.pos.y > c.initY) {
+      c.pos.y = c.initY;
+      c.grounded = true;
+    } else {
+      console.log(player.speed);
+      c.pos.y -= c.speed;
+      c.speed -= G.CUBE_ACCEL;
+    }
+  }
+
+  rect(c.pos, G.CUBE_SIZE);
 }
