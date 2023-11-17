@@ -7,13 +7,23 @@ Avoid pointies
 
 characters = [];
 
-options = {
-};
-
 // Universal Constants
 const G = {
   TICKS_PER_BEAT: 30,
+  
+  EXAMPLE_Y: 30,
+  PLAYER_Y: 75,
+  
+  CUBE_X: 46,
+  CUBE_SIZE: 8,
+  CUBE_ACCEL: 10,
+
+  SCREEN: vec(100, 100),
 }
+
+options = {
+  viewSize: G.SCREEN, 
+};
 
 /**
  * @typedef {{
@@ -24,6 +34,7 @@ const G = {
  */
 
 /**
+ * The song that will play
  * @type { Note[] }
  */
 const Song = [
@@ -79,24 +90,54 @@ const Song = [
   },
 ]
 
-// Define the song that will play (and repeat after 8 beats)
+/**
+ * @typedef {{
+ * pos: Vector
+ * speed: number
+ * grounded: boolean
+ * }} cube
+ */
 
-let count = 0;
+/**
+ * @type { cube }
+ */
+let player;
+
+/**
+ * @type { cube }
+ */
+let example;
 
 function update() {
   // Initialize
   if (!ticks) {
+    example = {
+      pos: vec(G.CUBE_X, G.EXAMPLE_Y),
+      speed: 0,
+      grounded: true,
+    }
 
+    player = {
+      pos: vec(G.CUBE_X, G.PLAYER_Y),
+      speed: 0,
+      grounded: true,
+    }
   }
 
   // Play the song
-  playSong()
+  playSong();
 
-  if(ticks % G.TICKS_PER_BEAT == 0) {
-    // Handle stuff on every beat
-  }
+  // Draw the grounds
+  color("black");
+  line(0, G.EXAMPLE_Y + G.CUBE_SIZE, G.SCREEN.x, G.EXAMPLE_Y + G.CUBE_SIZE);
+  line(0, G.PLAYER_Y + G.CUBE_SIZE, G.SCREEN.x, G.PLAYER_Y + G.CUBE_SIZE);
 
-  text(count.toString(), 50, 50);
+  // Draw the players
+  color("cyan")
+  rect(example.pos, G.CUBE_SIZE);
+
+  color("red")
+  rect(player.pos, G.CUBE_SIZE);
 }
 
 // Plays the background song
