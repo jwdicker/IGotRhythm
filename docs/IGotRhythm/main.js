@@ -221,7 +221,7 @@ function update() {
       // Make the example jump when needed
       if(example_turn && spike_layout[curBeat]) {
         play("jump");
-        jump(example);
+        jump(example, "jump");
       }
     }
   }
@@ -229,7 +229,7 @@ function update() {
   // Take in player input
   if(input.isJustPressed) {
     play("select", {pitch: 60});
-    jump(player);
+    jump(player, "select", 60);
   }
 
   // Draw and move the players
@@ -286,9 +286,12 @@ function playSong () {
 /**
  * Causes a cube to jump
  * @param {Cube} c The cube that will jump
+ * @param {SoundEffectType} sound The sound that will play when the jump happens
+ * @param {number?} pitch? The pitch of the sound
  */
-function jump(c) {
+function jump(c, sound, pitch = null) {
   if(c.grounded) {
+    play(sound, {pitch: pitch});
     c.speed = G.CUBE_JUMP_SPD;
     c.grounded = false;
     c.pos.y -= c.speed;
