@@ -25,10 +25,10 @@ const G = {
   
   CUBE_X: 50,
   CUBE_SIZE: 8,
-  CUBE_JUMP_SPD: 3,
-  CUBE_ACCEL: 0.75,
+  CUBE_JUMP_SPD: 4,
+  CUBE_ACCEL: 1,
 
-  SPIKE_SPEED: 1,
+  SPIKE_SPEED: 3,
   SPIKE_INIT_X: 100,
 
   SCREEN: vec(100, 100),
@@ -160,9 +160,7 @@ function update() {
       grounded: true,
     }
 
-    example_wave = [{
-      pos: vec(50, 50)
-    }];
+    example_wave = [];
     player_wave = [];
 
     spawning_example = true;
