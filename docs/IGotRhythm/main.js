@@ -244,6 +244,7 @@ function update() {
 
     const endGameTime = char("a", es.pos).isColliding.rect.cyan;
     if(endGameTime) {
+      play("explosion");
       end();
     }
 
@@ -256,6 +257,7 @@ function update() {
 
     const endGameTime = char("a", ps.pos).isColliding.rect.red;
     if(endGameTime) {
+      play("explosion");
       end();
     }
     return ps.pos.x < 0;
