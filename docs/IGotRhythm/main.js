@@ -335,6 +335,6 @@ function makeSpikes() {
 
 function setLayout() {
   for(let i = 0; i < 8; i++) {
-    spike_layout[i] = true;
+    spike_layout[i] = (rnd() > 0.5);
   }
 }
