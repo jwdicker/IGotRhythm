@@ -32,10 +32,13 @@ const G = {
   SPIKE_INIT_X: 120,
 
   SCREEN: vec(100, 100),
+
+  TXT_OFFSET: 5,
 }
 
 options = {
   viewSize: G.SCREEN, 
+  isShowingScore: false,
 };
 
 /**
@@ -231,9 +234,11 @@ function update() {
 
   // Draw and move the players
   color("cyan");
+  text("Watch", G.TXT_OFFSET, G.EXAMPLE_Y - G.TXT_OFFSET);
   moveCube(example);
 
   color("red");
+  text("You", G.TXT_OFFSET, G.PLAYER_Y - G.TXT_OFFSET);
   moveCube(player);
 
   // Move and draw the spikes
