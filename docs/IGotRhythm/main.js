@@ -26,10 +26,10 @@ const G = {
   CUBE_X: 50,
   CUBE_SIZE: 8,
   CUBE_JUMP_SPD: 4,
-  CUBE_ACCEL: 1,
+  CUBE_ACCEL: 0.75,
 
   SPIKE_SPEED: 3,
-  SPIKE_INIT_X: 100,
+  SPIKE_INIT_X: 160,
 
   SCREEN: vec(100, 100),
 }
@@ -144,6 +144,11 @@ let player_wave;
 let spawning_example;
 
 /**
+ * @type { boolean }
+ */
+let example_turn;
+
+/**
  * @type { boolean[] }
  */
 let spike_layout;
@@ -152,6 +157,11 @@ let spike_layout;
  * @type { boolean }
  */
 let intro;
+
+/**
+ * @type { number }
+ */
+let curBeat;
 
 function update() {
   // Initialize
@@ -179,10 +189,8 @@ function update() {
     setLayout();
 
     intro = true;
+    example_turn = false;
   }
-
-  // Play the song
-  playSong();
 
   // Draw the grounds
   color("black");
@@ -193,7 +201,26 @@ function update() {
 
   // Actions to be performed only on the down and off beats
   if(ticks % (G.TICKS_PER_BEAT / 2) == 0) {
-    makeSpikes();
+    curBeat = (ticks / G.TICKS_PER_BEAT) % 8;
+
+    // Play the song
+    playSong();
+
+    // On only downbeats
+    if(curBeat % 1 == 0) {
+      // Switch whose turn it is
+      if(curBeat == 0 && !intro) {
+        example_turn = !example_turn;
+      }
+      // Generate any spikes
+      makeSpikes();
+
+      // Make the example jump when needed
+      if(example_turn && spike_layout[curBeat]) {
+        play("jump");
+        jump(example);
+      }
+    }
   }
 
   // Take in player input
@@ -210,7 +237,7 @@ function update() {
 
   // Move and draw the spikes
   color("light_black")
-  example_wave.forEach((es) => {
+  remove(example_wave, (es) => {
     // Move the spike
     es.pos.x -= G.SPIKE_SPEED;
 
@@ -218,27 +245,29 @@ function update() {
     // if(endGameTime) {
     //   end();
     // }
+
+    return es.pos.x < 0;
   });
 
-  player_wave.forEach((ps) => {
+  remove(player_wave, (ps) => {
     // Move the spike
     ps.pos.x -= G.SPIKE_SPEED;
 
     const endGameTime = char("a", ps.pos).isColliding.rect.red;
-    if(endGameTime) {
-      end();
-    }
+    // if(endGameTime) {
+    //   end();
+    // }
+    return ps.pos.x < 0;
   });
 }
 
 // Plays the background song
 function playSong () {
-  const curBeat = (floor(ticks / G.TICKS_PER_BEAT) % 8) + 1;
   const downBeat = (ticks % G.TICKS_PER_BEAT) == 0
   const offBeat = (ticks % G.TICKS_PER_BEAT) == G.TICKS_PER_BEAT / 2;
 
   for(let note of Song) {
-    if(note.beat == curBeat) {
+    if(note.beat == (floor(curBeat) + 1)) {
       if((note.onEighth && offBeat) || (!note.onEighth && downBeat)) {
         play("coin", {pitch: note.pitch, volume: 0.5});
       }
@@ -277,13 +306,13 @@ function moveCube(c) {
 }
 
 function makeSpikes() {
-  const curSpawnSubBeat = ((floor(ticks / (G.TICKS_PER_BEAT / 2)) + 1) % 16);
-
-  if(intro && curSpawnSubBeat == 0) {
+  const spawnBeat = (curBeat + 1) % 8;
+  if(intro && spawnBeat == 0) {
+    console.log("begin");
     intro = false;
   }
 
-  if(!intro && spike_layout[curSpawnSubBeat]) {
+  if(!intro && spike_layout[spawnBeat]) {
     if(spawning_example) {
       example_wave.push({
         pos: vec(G.SPIKE_INIT_X, G.EXAMPLE_Y),
@@ -295,7 +324,7 @@ function makeSpikes() {
     }
   }
 
-  if(curSpawnSubBeat == 15) {
+  if(spawnBeat == 7) {
     if(!spawning_example) {
       setLayout();
     }
@@ -304,7 +333,7 @@ function makeSpikes() {
 }
 
 function setLayout() {
-  for(let i = 0; i < 16; i++) {
-    spike_layout[i] = (rnd() < 0.5);
+  for(let i = 0; i < 8; i++) {
+    spike_layout[i] = true;
   }
 }
