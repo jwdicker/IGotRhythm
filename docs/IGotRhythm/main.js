@@ -25,11 +25,11 @@ const G = {
   
   CUBE_X: 50,
   CUBE_SIZE: 8,
-  CUBE_JUMP_SPD: 4,
-  CUBE_ACCEL: 0.75,
+  CUBE_JUMP_SPD: 2.5,
+  CUBE_ACCEL: 0.25,
 
-  SPIKE_SPEED: 3,
-  SPIKE_INIT_X: 160,
+  SPIKE_SPEED: 1,
+  SPIKE_INIT_X: 120,
 
   SCREEN: vec(100, 100),
 }
@@ -306,7 +306,7 @@ function moveCube(c) {
 }
 
 function makeSpikes() {
-  const spawnBeat = (curBeat + 1) % 8;
+  const spawnBeat = (curBeat + 2) % 8;
   if(intro && spawnBeat == 0) {
     console.log("begin");
     intro = false;
