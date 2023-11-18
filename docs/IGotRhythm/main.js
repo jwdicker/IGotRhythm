@@ -143,6 +143,16 @@ let player_wave;
  */
 let spawning_example;
 
+/**
+ * @type { boolean[] }
+ */
+let spike_layout;
+
+/**
+ * @type { boolean }
+ */
+let intro;
+
 function update() {
   // Initialize
   if (!ticks) {
@@ -162,12 +172,17 @@ function update() {
 
     example_wave = [];
     player_wave = [];
+    spike_layout = [];
 
-    spawning_example = true;
+    spawning_example = false;
+
+    setLayout();
+
+    intro = true;
   }
 
   // Play the song
-  // playSong();
+  playSong();
 
   // Draw the grounds
   color("black");
@@ -175,6 +190,11 @@ function update() {
   const playerLineOffset = G.PLAYER_Y + (G.CUBE_SIZE / 2);
   line(0, exampleLineOffset, G.SCREEN.x, exampleLineOffset);
   line(0, playerLineOffset, G.SCREEN.x, playerLineOffset);
+
+  // Actions to be performed only on the down and off beats
+  if(ticks % (G.TICKS_PER_BEAT / 2) == 0) {
+    makeSpikes();
+  }
 
   // Take in player input
   if(input.isJustPressed) {
@@ -195,9 +215,9 @@ function update() {
     es.pos.x -= G.SPIKE_SPEED;
 
     const endGameTime = char("a", es.pos).isColliding.rect.cyan;
-    if(endGameTime) {
-      end();
-    }
+    // if(endGameTime) {
+    //   end();
+    // }
   });
 
   player_wave.forEach((ps) => {
@@ -254,4 +274,37 @@ function moveCube(c) {
   }
 
   box(c.pos, G.CUBE_SIZE);
+}
+
+function makeSpikes() {
+  const curSpawnSubBeat = ((floor(ticks / (G.TICKS_PER_BEAT / 2)) + 1) % 16);
+
+  if(intro && curSpawnSubBeat == 0) {
+    intro = false;
+  }
+
+  if(!intro && spike_layout[curSpawnSubBeat]) {
+    if(spawning_example) {
+      example_wave.push({
+        pos: vec(G.SPIKE_INIT_X, G.EXAMPLE_Y),
+      });
+    } else {
+      player_wave.push({
+        pos: vec(G.SPIKE_INIT_X, G.PLAYER_Y),
+      });
+    }
+  }
+
+  if(curSpawnSubBeat == 15) {
+    if(!spawning_example) {
+      setLayout();
+    }
+    spawning_example = !spawning_example;
+  }
+}
+
+function setLayout() {
+  for(let i = 0; i < 16; i++) {
+    spike_layout[i] = (rnd() < 0.5);
+  }
 }
