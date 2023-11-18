@@ -220,7 +220,6 @@ function update() {
 
       // Make the example jump when needed
       if(example_turn && spike_layout[curBeat]) {
-        play("jump");
         jump(example, "jump");
       }
     }
@@ -228,7 +227,6 @@ function update() {
 
   // Take in player input
   if(input.isJustPressed) {
-    play("select", {pitch: 60});
     jump(player, "select", 60);
   }
 
