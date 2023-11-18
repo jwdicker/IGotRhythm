@@ -5,7 +5,16 @@ Press to jump
 Avoid pointies
 `;
 
-characters = [];
+characters = [
+`
+  l
+  l
+ lll
+ lll
+lllll
+lllll
+`
+];
 
 // Universal Constants
 const G = {
@@ -14,10 +23,13 @@ const G = {
   EXAMPLE_Y: 30,
   PLAYER_Y: 75,
   
-  CUBE_X: 46,
+  CUBE_X: 50,
   CUBE_SIZE: 8,
   CUBE_JUMP_SPD: 3,
   CUBE_ACCEL: 0.75,
+
+  SPIKE_SPEED: 1,
+  SPIKE_INIT_X: 100,
 
   SCREEN: vec(100, 100),
 }
@@ -110,6 +122,27 @@ let player;
  */
 let example;
 
+/**
+ * @typedef {{
+ * pos: Vector
+ * }} Spike
+ */
+
+/**
+ * @type { Spike[] }
+ */
+let example_wave;
+
+/**
+ * @type { Spike[] }
+ */
+let player_wave;
+
+/**
+ * @type { boolean }
+ */
+let spawning_example;
+
 function update() {
   // Initialize
   if (!ticks) {
@@ -126,27 +159,58 @@ function update() {
       speed: 0,
       grounded: true,
     }
+
+    example_wave = [{
+      pos: vec(50, 50)
+    }];
+    player_wave = [];
+
+    spawning_example = true;
   }
 
   // Play the song
-  playSong();
+  // playSong();
 
   // Draw the grounds
   color("black");
-  line(0, G.EXAMPLE_Y + G.CUBE_SIZE, G.SCREEN.x, G.EXAMPLE_Y + G.CUBE_SIZE);
-  line(0, G.PLAYER_Y + G.CUBE_SIZE, G.SCREEN.x, G.PLAYER_Y + G.CUBE_SIZE);
+  const exampleLineOffset = G.EXAMPLE_Y + (G.CUBE_SIZE / 2)
+  const playerLineOffset = G.PLAYER_Y + (G.CUBE_SIZE / 2);
+  line(0, exampleLineOffset, G.SCREEN.x, exampleLineOffset);
+  line(0, playerLineOffset, G.SCREEN.x, playerLineOffset);
 
   // Take in player input
   if(input.isJustPressed) {
     jump(player);
   }
 
-  // Draw the players
+  // Draw and move the players
   color("cyan");
   moveCube(example);
 
   color("red");
   moveCube(player);
+
+  // Move and draw the spikes
+  color("light_black")
+  example_wave.forEach((es) => {
+    // Move the spike
+    es.pos.x -= G.SPIKE_SPEED;
+
+    const endGameTime = char("a", es.pos).isColliding.rect.cyan;
+    if(endGameTime) {
+      end();
+    }
+  });
+
+  player_wave.forEach((ps) => {
+    // Move the spike
+    ps.pos.x -= G.SPIKE_SPEED;
+
+    const endGameTime = char("a", ps.pos).isColliding.rect.red;
+    if(endGameTime) {
+      end();
+    }
+  });
 }
 
 // Plays the background song
@@ -186,11 +250,10 @@ function moveCube(c) {
       c.pos.y = c.initY;
       c.grounded = true;
     } else {
-      console.log(player.speed);
       c.pos.y -= c.speed;
       c.speed -= G.CUBE_ACCEL;
     }
   }
 
-  rect(c.pos, G.CUBE_SIZE);
+  box(c.pos, G.CUBE_SIZE);
 }
