@@ -225,6 +225,7 @@ function update() {
 
   // Take in player input
   if(input.isJustPressed) {
+    play("select", {pitch: 60});
     jump(player);
   }
 
@@ -242,9 +243,9 @@ function update() {
     es.pos.x -= G.SPIKE_SPEED;
 
     const endGameTime = char("a", es.pos).isColliding.rect.cyan;
-    // if(endGameTime) {
-    //   end();
-    // }
+    if(endGameTime) {
+      end();
+    }
 
     return es.pos.x < 0;
   });
@@ -254,9 +255,9 @@ function update() {
     ps.pos.x -= G.SPIKE_SPEED;
 
     const endGameTime = char("a", ps.pos).isColliding.rect.red;
-    // if(endGameTime) {
-    //   end();
-    // }
+    if(endGameTime) {
+      end();
+    }
     return ps.pos.x < 0;
   });
 }
